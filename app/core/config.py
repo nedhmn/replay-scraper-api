@@ -18,5 +18,8 @@ class Settings(BaseSettings):
         default="INFO"
     )
 
+    ANTICAPTCHA_API_KEY: str = Field(...)
+    SITE_KEY: str = Field(...)
+
 
 settings = Settings()

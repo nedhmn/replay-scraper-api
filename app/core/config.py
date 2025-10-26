@@ -14,6 +14,9 @@ class Settings(BaseSettings):
 
     ENVIRONMENT: Literal["local", "staging", "production"] = Field(default="local")
     PROJECT_NAME: str = Field(default="Replay Scraper API")
+    LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = Field(
+        default="INFO"
+    )
 
 
 settings = Settings()

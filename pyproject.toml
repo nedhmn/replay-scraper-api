@@ -19,5 +19,16 @@ dev = [
     "ruff>=0.14.2",
 ]
 
+[tool.mypy]
+python_version = "3.12"
+files = ["app/**/*.py"]
+exclude = ['(?x)(^|/)ignore_.*\.py$']
+plugins = ["pydantic.mypy"]
+strict = true
+
+[tool.ruff]
+target-version = "py312"
+include = ["app/**/*.py"]
+
 [tool.uv]
 cache-dir=".cache"

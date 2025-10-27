@@ -20,18 +20,18 @@ ENV UV_COMPILE_BYTECODE=1
 # Ref: https://docs.astral.sh/uv/guides/integration/docker/#caching
 ENV UV_LINK_MODE=copy
 
+# Copy dependency files
+COPY ./pyproject.toml ./uv.lock /app/
+
 # Install dependencies
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
-RUN --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-project
+RUN uv sync --frozen --no-install-project
 
 ENV PYTHONPATH=/app
 
-COPY ./pyproject.toml ./uv.lock /app/
-
+# Copy application code
 COPY ./app /app/app
 
+# Sync the project
 RUN uv sync
 
 CMD fastapi run --host 0.0.0.0 --port ${PORT:-8000} app/main.py

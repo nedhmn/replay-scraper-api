@@ -21,5 +21,11 @@ class Settings(BaseSettings):
     ANTICAPTCHA_API_KEY: str = Field(...)
     SITE_KEY: str = Field(...)
 
+    AWS_REGION: str = Field(default="us-east-1")
+    AWS_ACCESS_KEY_ID: str = Field(...)
+    AWS_SECRET_ACCESS_KEY: str = Field(...)
+    S3_BUCKET_NAME: str = Field(...)
+    S3_REPLAYS_PREFIX: str = Field(default="replays/")
+
 
 settings = Settings()

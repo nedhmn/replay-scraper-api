@@ -29,5 +29,7 @@ class Settings(BaseSettings):
 
     API_KEY_HASH: str = Field(...)
 
+    RATE_LIMIT_PER_MINUTE: int = Field(default=200)
+
 
 settings = Settings()

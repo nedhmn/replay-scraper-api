@@ -10,6 +10,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.middleware.gzip import GZipMiddleware
 
 from app.api.main import authenticated_router, public_router
 from app.core.config import settings
@@ -62,6 +63,7 @@ app.add_exception_handler(StarletteHTTPException, http_exception_handler)  # typ
 app.add_exception_handler(Exception, general_exception_handler)
 
 # Middleware stack
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(SlowAPIMiddleware)
 app.middleware("http")(metrics_middleware)
 app.middleware("http")(request_id_middleware)

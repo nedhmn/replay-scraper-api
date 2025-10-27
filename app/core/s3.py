@@ -11,6 +11,12 @@ from app.core.config import settings
 logger = logging.getLogger(__name__)
 
 
+def _get_replay_data_model():
+    from app.api.replays.models import ReplayData
+
+    return ReplayData
+
+
 class ReplayS3Service:
     def __init__(self, session: aioboto3.Session):
         self.session = session
@@ -21,7 +27,8 @@ class ReplayS3Service:
     def _get_s3_key(self, replay_id: str) -> str:
         return f"{self.prefix}{replay_id}_replay.json"
 
-    async def get_replay(self, replay_id: str) -> dict[str, Any] | None:
+    async def get_replay(self, replay_id: str):
+        ReplayData = _get_replay_data_model()
         s3_key = self._get_s3_key(replay_id)
 
         async with self.session.client("s3", region_name=self.region) as s3_client:
@@ -36,7 +43,7 @@ class ReplayS3Service:
                 replay_data: dict[str, Any] = json.loads(body_bytes.decode("utf-8"))
 
                 logger.info("Found replay in S3: %s", s3_key)
-                return replay_data
+                return ReplayData.model_validate(replay_data)
 
             except ClientError as e:
                 error_code = e.response["Error"]["Code"]
@@ -52,14 +59,14 @@ class ReplayS3Service:
                 )
                 raise
 
-    async def save_replay(self, replay_id: str, data: dict[str, Any]) -> None:
+    async def save_replay(self, replay_id: str, data) -> None:
         s3_key = self._get_s3_key(replay_id)
 
         async with self.session.client("s3", region_name=self.region) as s3_client:
             try:
                 logger.info("Saving replay to S3: %s", s3_key)
 
-                json_bytes = json.dumps(data, indent=2).encode("utf-8")
+                json_bytes = json.dumps(data.model_dump(), indent=2).encode("utf-8")
 
                 await s3_client.put_object(
                     Bucket=self.bucket_name,

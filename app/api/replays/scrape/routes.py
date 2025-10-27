@@ -1,9 +1,10 @@
-from typing import Annotated, Any
+from typing import Annotated
 from urllib.parse import parse_qs, urlparse
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.deps import S3ServiceDep
+from app.api.replays.models import ReplayData
 from app.api.replays.scrape.models import ReplayUrlRequest, ValidatedReplayData
 from app.api.replays.scrape.services import scrape_replay
 
@@ -62,11 +63,11 @@ async def validate_and_clean_replay_url(
     return ValidatedReplayData(cleaned_url=cleaned_url, replay_id=replay_id)
 
 
-@router.post("")
+@router.post("", response_model=ReplayData)
 async def scrape_replay_route(
     validated: Annotated[ValidatedReplayData, Depends(validate_and_clean_replay_url)],
     s3_service: S3ServiceDep,
-) -> dict[str, Any]:
+) -> ReplayData:
     replay_id_str = str(validated.replay_id)
 
     cached_replay = await s3_service.get_replay(replay_id_str)

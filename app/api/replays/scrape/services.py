@@ -1,11 +1,11 @@
-from typing import Any
-
 import httpx
 from anticaptchaofficial.recaptchav3proxyless import (  # type: ignore
     recaptchaV3Proxyless,
 )
 from fastapi import HTTPException, status
+from pydantic import ValidationError
 
+from app.api.replays.models import ReplayData
 from app.core.config import settings
 
 
@@ -19,7 +19,7 @@ async def solve_recaptcha_v3(url: str) -> str:
 
     g_response: str = solver.solve_and_return_solution()
 
-    # Weirdly, the solver returns "0" when the CAPTCHA is solved.
+    # Weirdly, the solver returns "0" when the CAPTCHA fails.
     # ref: https://anti-captcha.com/apidoc/task-types/RecaptchaV3TaskProxyless
 
     if g_response == "0":
@@ -31,7 +31,7 @@ async def solve_recaptcha_v3(url: str) -> str:
     return g_response
 
 
-async def scrape_replay(url: str, replay_id: str) -> dict[str, Any]:
+async def scrape_replay(url: str, replay_id: str) -> ReplayData:
     g_response = await solve_recaptcha_v3(url)
 
     async with httpx.AsyncClient() as client:
@@ -41,16 +41,10 @@ async def scrape_replay(url: str, replay_id: str) -> dict[str, Any]:
 
         replay_data = response.json()
 
-    if not isinstance(replay_data, dict):
+    try:
+        return ReplayData.model_validate(replay_data)
+    except ValidationError as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Invalid response from DuelingBook",
-        )
-
-    if "plays" not in replay_data:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Invalid response from DuelingBook",
-        )
-
-    return replay_data
+            detail="Invalid response from DuelingBook.",
+        ) from exc

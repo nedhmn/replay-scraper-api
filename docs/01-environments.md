@@ -1,4 +1,14 @@
-# Environments
+## Table of Contents
+
+- [Table of Contents](#table-of-contents)
+- [Prerequisites](#prerequisites)
+- [Local Environment](#local-environment)
+  - [Setup](#setup)
+  - [Run](#run)
+- [Production Environment](#production-environment)
+  - [Generate API Key](#generate-api-key)
+  - [Configure](#configure)
+  - [Run](#run-1)
 
 
 ## Prerequisites

@@ -1,4 +1,19 @@
-# Deployment
+## Table of Contents
+
+- [Table of Contents](#table-of-contents)
+- [Deployment](#deployment)
+- [Railway Setup](#railway-setup)
+  - [Create Project \& Service](#create-project--service)
+  - [Configure Environment Variables](#configure-environment-variables)
+  - [Make Service Public](#make-service-public)
+  - [Optional Settings](#optional-settings)
+- [GitHub Setup](#github-setup)
+  - [Add Railway Token](#add-railway-token)
+  - [Deploy](#deploy)
+- [Monitor](#monitor)
+
+
+## Deployment
 
 Railway deployment via GitHub Actions.
 

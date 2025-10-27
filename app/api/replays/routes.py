@@ -4,7 +4,8 @@ from fastapi import APIRouter, Query
 
 from app.api.deps import S3ServiceDep
 from app.api.replays.models import ReplayListParams, ReplayListResponse
-from app.api.replays.services import list_replays_service
+from app.api.replays.services import get_replay_service, list_replays_service
+from app.core.models import ReplayData
 
 router = APIRouter()
 
@@ -19,3 +20,11 @@ async def list_replays(
         page_size=params.page_size,
         after=params.after,
     )
+
+
+@router.get("/{replay_id}", response_model=ReplayData)
+async def get_replay(
+    replay_id: str,
+    s3_service: S3ServiceDep,
+) -> ReplayData:
+    return await get_replay_service(s3_service=s3_service, replay_id=replay_id)

@@ -51,7 +51,7 @@ FastAPI service for scraping DuelingBook replay data. Built for personal use.
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/replays/scrape \
-  -H "X-API-Key: api_..." \
+  -H "x-api-key: api_..." \
   -H "Content-Type: application/json" \
   -d '{"replay_url": "https://www.duelingbook.com/replay?id=123456"}'
 ```

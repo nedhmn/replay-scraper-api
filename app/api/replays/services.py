@@ -1,7 +1,8 @@
 from fastapi import HTTPException, status
 
-from app.api.replays.models import ReplayData, ReplayListResponse, ReplayPagination
+from app.core.models import ReplayData
 from app.core.s3 import ReplayS3Service
+from app.api.replays.models import ReplayListResponse, ReplayPagination
 
 
 async def get_replay_service(s3_service: ReplayS3Service, replay_id: str) -> ReplayData:

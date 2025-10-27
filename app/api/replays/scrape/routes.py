@@ -4,9 +4,9 @@ from urllib.parse import parse_qs, urlparse
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.deps import S3ServiceDep
-from app.api.replays.models import ReplayData
 from app.api.replays.scrape.models import ReplayUrlRequest, ValidatedReplayData
 from app.api.replays.scrape.services import scrape_replay
+from app.core.models import ReplayData
 
 router = APIRouter()
 

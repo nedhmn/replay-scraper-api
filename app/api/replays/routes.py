@@ -3,8 +3,9 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 
 from app.api.deps import S3ServiceDep
-from app.api.replays.models import ReplayData, ReplayListParams, ReplayListResponse
+from app.api.replays.models import ReplayListParams, ReplayListResponse
 from app.api.replays.services import get_replay_service, list_replays_service
+from app.core.models import ReplayData
 
 router = APIRouter()
 

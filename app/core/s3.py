@@ -7,14 +7,9 @@ from botocore.exceptions import ClientError
 from fastapi import Request
 
 from app.core.config import settings
+from app.core.models import ReplayData
 
 logger = logging.getLogger(__name__)
-
-
-def _get_replay_data_model():
-    from app.api.replays.models import ReplayData
-
-    return ReplayData
 
 
 class ReplayS3Service:
@@ -27,8 +22,7 @@ class ReplayS3Service:
     def _get_s3_key(self, replay_id: str) -> str:
         return f"{self.prefix}{replay_id}_replay.json"
 
-    async def get_replay(self, replay_id: str):
-        ReplayData = _get_replay_data_model()
+    async def get_replay(self, replay_id: str) -> ReplayData | None:
         s3_key = self._get_s3_key(replay_id)
 
         async with self.session.client("s3", region_name=self.region) as s3_client:
@@ -59,7 +53,7 @@ class ReplayS3Service:
                 )
                 raise
 
-    async def save_replay(self, replay_id: str, data) -> None:
+    async def save_replay(self, replay_id: str, data: ReplayData) -> None:
         s3_key = self._get_s3_key(replay_id)
 
         async with self.session.client("s3", region_name=self.region) as s3_client:

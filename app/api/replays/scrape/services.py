@@ -5,8 +5,8 @@ from anticaptchaofficial.recaptchav3proxyless import (  # type: ignore
 from fastapi import HTTPException, status
 from pydantic import ValidationError
 
-from app.api.replays.models import ReplayData
 from app.core.config import settings
+from app.core.models import ReplayData
 
 
 async def solve_recaptcha_v3(url: str) -> str:

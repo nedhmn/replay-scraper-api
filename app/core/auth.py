@@ -11,6 +11,10 @@ def verify_api_key_hash(plain_key: str, key_hash: str) -> bool:
 
 
 async def verify_api_key(x_api_key: str = Header(..., alias="x-api-key")) -> None:
+    # Bypass auth in local environment for testing
+    if settings.ENVIRONMENT == "local":
+        return
+
     if not verify_api_key_hash(x_api_key, settings.API_KEY_HASH):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

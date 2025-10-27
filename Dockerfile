@@ -29,6 +29,7 @@ RUN uv sync --frozen --no-install-project
 ENV PYTHONPATH=/app
 
 # Copy application code
+COPY ./scripts /app/scripts
 COPY ./app /app/app
 
 # Sync the project

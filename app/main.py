@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.api.main import router
+from app.api.main import authenticated_router, public_router
 from app.core.config import settings
 from app.core.exceptions import (
     general_exception_handler,
@@ -54,4 +54,5 @@ app.middleware("http")(metrics_middleware)
 app.middleware("http")(request_id_middleware)
 app.middleware("http")(security_headers_middleware)
 
-app.include_router(router, prefix="/api/v1")
+app.include_router(public_router, prefix="/api/v1")
+app.include_router(authenticated_router, prefix="/api/v1")

@@ -27,5 +27,7 @@ class Settings(BaseSettings):
     S3_BUCKET_NAME: str = Field(...)
     S3_REPLAYS_PREFIX: str = Field(default="replays/")
 
+    API_KEY_HASH: str = Field(...)
+
 
 settings = Settings()

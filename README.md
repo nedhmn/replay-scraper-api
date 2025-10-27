@@ -1,57 +1,66 @@
 # Replay Scraper API
 
-FastAPI service for scraping DuelingBook replay data. Built for personal use.
+FastAPI service for scraping DuelingBook replay data with captcha bypass.
+
+## Table of Contents
+
+- [Table of Contents](#table-of-contents)
+- [Features](#features)
+- [Quick Start](#quick-start)
+   - [Prerequisites](#prerequisites)
+   - [Local Setup](#local-setup)
+   - [Example Request](#example-request)
+- [Documentation](#documentation)
+- [Performance](#performance)
+
 
 ## Features
 
-- **POST `/api/v1/replays/scrape`**: Scrape DuelingBook replays, bypass captcha with [Anti-Captcha](https://anti-captcha.com/)
-- **S3 caching**: Stores scraped replays to avoid re-scraping
-- **API key auth**: Single key authentication for trusted users
+- Scrape DuelingBook replays via [Anti-Captcha](https://anti-captcha.com/)
+- S3 caching to avoid re-scraping
+- (Single) API key authentication 
+- Rate limiting (200 req/min)
 
-## Prerequisites
+## Quick Start
 
-- Python 3.12+
-- [uv](https://docs.astral.sh/uv/) package manager
-- AWS S3 bucket
-- [Anti-Captcha](https://anti-captcha.com/) account with API key
-- DuelingBook site key for captcha solving
+### Prerequisites
 
-## Setup
+- Docker + Docker Compose
+- AWS S3 bucket + credentials
+- [Anti-Captcha](https://anti-captcha.com/) API key
+- DuelingBook site key
 
-1. **Clone and install dependencies**
-   ```bash
-   git clone <repo-url>
-   cd replay-scraper-api
-   uv sync
-   ```
+### Local Setup
 
-2. **Generate API key**
-   ```bash
-   uv run python scripts/generate_api_key.py
-   ```
-   Copy the `API_KEY` (share with users) and `API_KEY_HASH` (for `.env`)
+```bash
+cp .env.example .env
+# Fill in required vars (see docs/01-environments.md)
 
-3. **Configure environment**
-   ```bash
-   cp .env.example .env
-   ```
-   Fill in:
-   - `ANTICAPTCHA_API_KEY` - Your [Anti-Captcha](https://anti-captcha.com/) API key
-   - `SITE_KEY` - DuelingBook captcha site key
-   - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `S3_BUCKET_NAME` - AWS credentials
-   - `API_KEY_HASH` - Hash from step 2
+docker compose up -d --build
+```
 
-4. **Run locally**
-   ```bash
-   uv run fastapi dev app/main.py
-   ```
-   API docs available at `http://localhost:8000/docs`
+API docs: `http://localhost:8000/docs`
 
-## Usage
+> [!NOTE]
+> Auth bypassed in local mode. Use any dummy `x-api-key` value.
+
+### Example Request
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/replays/scrape \
-  -H "x-api-key: api_..." \
+  -H "x-api-key: dummy" \
   -H "Content-Type: application/json" \
   -d '{"replay_url": "https://www.duelingbook.com/replay?id=123456"}'
 ```
+
+## Documentation
+
+- **[Environments](docs/01-environments.md)** - Local & production setup
+- **[Deployment](docs/02-deployment.md)** - Railway deployment via GitHub Actions
+- **[Usage](docs/03-usage.md)** - API routes & examples
+
+## Performance
+
+- ~10 seconds per scrape
+- High error rate at high request volumes (Anti-Captcha limitations)
+- Cached replays return instantly

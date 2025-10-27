@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.replays.scrape.models import ReplayUrlRequest, ValidatedReplayData
 from app.api.replays.scrape.services import scrape_replay
+from app.core.s3 import ReplayS3Service, get_replay_s3_service
 
 router = APIRouter()
 
@@ -64,5 +65,16 @@ async def validate_and_clean_replay_url(
 @router.post("")
 async def scrape_replay_route(
     validated: Annotated[ValidatedReplayData, Depends(validate_and_clean_replay_url)],
+    s3_service: Annotated[ReplayS3Service, Depends(get_replay_s3_service)],
 ) -> dict[str, Any]:
-    return scrape_replay(validated.cleaned_url, str(validated.replay_id))
+    replay_id_str = str(validated.replay_id)
+
+    cached_replay = await s3_service.get_replay(replay_id_str)
+    if cached_replay is not None:
+        return cached_replay
+
+    replay_data = await scrape_replay(validated.cleaned_url, replay_id_str)
+
+    await s3_service.save_replay(replay_id_str, replay_data)
+
+    return replay_data

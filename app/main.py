@@ -1,5 +1,8 @@
+import contextlib
 import logging
+from collections.abc import AsyncGenerator
 
+import aioboto3
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -23,7 +26,22 @@ configure_logging()
 logger = logging.getLogger(__name__)
 
 
-app = FastAPI(title=settings.PROJECT_NAME)
+@contextlib.asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    logger.info("Initializing aioboto3 session")
+    app.state.aioboto3_session = aioboto3.Session(
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        region_name=settings.AWS_REGION,
+    )
+
+    yield
+
+    logger.info("Cleaning up aioboto3 session")
+    app.state.aioboto3_session = None
+
+
+app = FastAPI(title=settings.PROJECT_NAME, lifespan=lifespan)
 
 # Exception handlers
 app.add_exception_handler(RequestValidationError, validation_exception_handler)  # type: ignore[arg-type]

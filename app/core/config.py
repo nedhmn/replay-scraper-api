@@ -27,5 +27,9 @@ class Settings(BaseSettings):
     S3_BUCKET_NAME: str = Field(...)
     S3_REPLAYS_PREFIX: str = Field(default="replays/")
 
+    API_KEY_HASH: str = Field(...)
+
+    RATE_LIMIT_PER_MINUTE: int = Field(default=200)
+
 
 settings = Settings()

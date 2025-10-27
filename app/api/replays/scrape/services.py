@@ -1,3 +1,5 @@
+import logging
+
 import httpx
 from anticaptchaofficial.recaptchav3proxyless import (  # type: ignore
     recaptchaV3Proxyless,
@@ -6,7 +8,10 @@ from fastapi import HTTPException, status
 from pydantic import ValidationError
 
 from app.core.config import settings
+from app.core.middleware import get_request_id
 from app.core.models import ReplayData
+
+logger = logging.getLogger(__name__)
 
 
 async def solve_recaptcha_v3(url: str) -> str:
@@ -23,6 +28,13 @@ async def solve_recaptcha_v3(url: str) -> str:
     # ref: https://anti-captcha.com/apidoc/task-types/RecaptchaV3TaskProxyless
 
     if g_response == "0":
+        request_id = get_request_id()
+        logger.error(
+            "CAPTCHA verification failed url=%s request_id=%s error_code=%s",
+            url,
+            request_id,
+            solver.error_code,
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to verify CAPTCHA. Please try again.",
@@ -44,6 +56,13 @@ async def scrape_replay(url: str, replay_id: str) -> ReplayData:
     try:
         return ReplayData.model_validate(replay_data)
     except ValidationError as exc:
+        request_id = get_request_id()
+        logger.error(
+            "Invalid replay response replay_id=%s request_id=%s errors=%s",
+            replay_id,
+            request_id,
+            exc.errors(),
+        )
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="Invalid response from DuelingBook.",

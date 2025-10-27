@@ -1,3 +1,5 @@
+import base64
+
 import bcrypt
 from fastapi import Header, HTTPException, status
 
@@ -5,7 +7,7 @@ from app.core.config import settings
 
 
 def verify_api_key_hash(plain_key: str, key_hash: str) -> bool:
-    return bcrypt.checkpw(plain_key.encode(), key_hash.encode())
+    return bcrypt.checkpw(plain_key.encode(), base64.b64decode(key_hash))
 
 
 async def verify_api_key(x_api_key: str = Header(..., alias="X-API-Key")) -> None:
